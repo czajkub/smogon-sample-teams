@@ -26,9 +26,9 @@ class DBConfig:
 
 def load_env() -> DBConfig:
     load_dotenv()
-    DB_URL = os.getenv("EXTERNAL_DB_URL")
+    DB_URL = os.getenv("DB_URL")
     if DB_URL is None:
-        raise ValueError("External database URL not set")
+        raise ValueError("Database URL not set")
     DB_HOSTNAME = os.getenv("DB_HOSTNAME")
     if DB_HOSTNAME is None:
         raise ValueError("Database hostname not set")

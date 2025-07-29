@@ -4,31 +4,10 @@ import re
 from bs4 import BeautifulSoup
 import requests
 
-
-types = [
-    "Normal",
-    "Fire",
-    "Water",
-    "Electric",
-    "Grass",
-    "Ice",
-    "Fighting",
-    "Poison",
-    "Ground",
-    "Flying",
-    "Psychic",
-    "Bug",
-    "Rock",
-    "Ghost",
-    "Dragon",
-    "Dark",
-    "Steel",
-    "Fairy",
-    "Stellar",
-]
+from .utils import *
 
 
-def pasteJSON(url: str) -> dict[str, str]:
+def toJSON(url: str) -> dict[str, str]:
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -48,14 +27,20 @@ def pasteJSON(url: str) -> dict[str, str]:
             continue
         if span.text in types:
             continue
+        if span.text in items:
+            continue
         mons.append(span.text)
 
     return {"mons": mons, "author": author, "title": title}
 
 
-if __name__ == "__main__":
+def main():
     if sys.argv.__len__() != 2:
         print("Provide only 1 argument: pokepaste url")
         sys.exit(1)
     url = sys.argv[1]
-    pasteJSON(url)
+    print(toJSON(url))
+
+
+if __name__ == "__main__":
+    main()

@@ -2,13 +2,17 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 
+
 class DBConfig:
-    def __init__(self, DB_URL: str, DB_HOSTNAME: str, DB_PORT: int, DB_USER: str, DB_PASS: str):
+    def __init__(
+        self, DB_URL: str, DB_HOSTNAME: str, DB_PORT: int, DB_USER: str, DB_PASS: str
+    ):
         self.DB_URL = DB_URL
         self.DB_HOSTNAME = DB_HOSTNAME
         self.DB_PORT = DB_PORT
         self.DB_USER = DB_USER
         self.DB_PASS = DB_PASS
+
     def connect(self):
         connection = None
         try:

@@ -3,47 +3,29 @@ import psycopg2
 
 from loadenv import load_env
 from pokeparser import parser
+import queries as q
 
 
-create_query = """
-CREATE TABLE teams (
-    id SERIAL PRIMARY KEY,
-    author TEXT NOT NULL,
-    title TEXT NOT NULL,
-    mons TEXT[]
-    );
-"""
-
-insert_query = """
-INSERT INTO teams (author, title, mons)
-VALUES (%s, %s, %s);
-"""
-
-check_query = """
-SELECT * FROM teams WHERE title=%s;
-"""
-
-
-def isduplicate(connection, title: str) -> bool:
-    cursor = connection.cursor()
-    query = cursor.execute(check_query, (title,))
-    cursor.close()
-    return query is not None
+def isduplicate(cursor, title: str) -> bool:
+    cursor.execute(q.check_query, (title,))
+    return cursor.fetchone() is not None
 
 
 def insert(connection, json: dict[str, str]) -> None:
-    if isduplicate(connection, json["title"]):
-        print(f"Team {json['title']} from url {url} already exists")
+    cursor = connection.cursor()
+    if isduplicate(cursor, json["title"]):
+        print(f"Team {json['title']} from url {json['url']} already exists in database")
         return
 
-    cursor = connection.cursor()
-    cursor.execute(insert_query, (json["author"], json["title"], json["mons"]))
+    cursor.execute(
+        q.insert_query, (json["author"], json["title"], json["mons"], json["url"])
+    )
 
     cursor.close()
     connection.commit()
 
 
-if __name__ == "__main__":
+def main():
     if sys.argv.__len__() == 1:
         print("Provide urls as arguments to add team")
         sys.exit(1)
@@ -51,6 +33,11 @@ if __name__ == "__main__":
     config = load_env()
     connection = psycopg2.connect(config.DB_URL)
     for url in urls:
-        json = parser.pasteJSON(url)
+        json = parser.toJSON(url)
+        json["url"] = url
         insert(connection, json)
     connection.close()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,19 +1,38 @@
+from typing import List
+from pydantic import BaseModel
+import psycopg2
 from fastapi import FastAPI
+
 from loadenv import load_env
 
 app = FastAPI()
 
-config = load_env()
-connection = config.connect()
+
+class Team(BaseModel):
+    title: str
+    author: str
+    mons: List[str]
+    url: str
 
 
 @app.get("/team")
-def get_team():
+def get_team(onlyone: bool = True, title: str | None = None, author: str = None, mons: List[str] = None):
+    config = load_env()
+    connection = psycopg2.connect(config.DB_URL)
     cursor = connection.cursor()
-    cursor.execute("SELECT team FROM teams")
+    query = f"SELECT {1 if onlyone else '*'} FROM teams"
+    if title:
+        query += f" WHERE title LIKE '{title}'"
+    if author:
+        query += f" WHERE author LIKE '{author}'"
+    if mons:
+        for mon in mons:
+            query += f" WHERE {mon} = ANY(mons)"
+    cursor.execute(query)
     team = cursor.fetchall()
     cursor.close()
-    print(team)
+    connection.close()
+    # print(team)
     return team
 
 

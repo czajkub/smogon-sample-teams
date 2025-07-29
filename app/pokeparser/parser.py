@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 
 from .utils import *
-
+# from utils import *
 
 def toJSON(url: str) -> dict[str, str]:
     response = requests.get(url)

@@ -23,6 +23,7 @@ def insert(connection, json: dict[str, str]) -> None:
 
     cursor.close()
     connection.commit()
+    print(f"Team {json['title']} from url {json['url']} inserted into database")
 
 
 def main():
@@ -34,7 +35,7 @@ def main():
     connection = psycopg2.connect(config.DB_URL)
     for url in urls:
         json = parser.toJSON(url)
-        json["url"] = url
+        json.update({"url": url})
         insert(connection, json)
     connection.close()
 

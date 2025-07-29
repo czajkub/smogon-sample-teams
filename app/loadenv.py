@@ -1,8 +1,6 @@
 import os
-from sqlite3 import Connection
-
-import psycopg2
 from dotenv import load_dotenv
+import psycopg2
 
 class DBConfig:
     def __init__(self, DB_URL: str, DB_HOSTNAME: str, DB_PORT: int, DB_USER: str, DB_PASS: str):
@@ -28,7 +26,7 @@ class DBConfig:
 
 def load_env() -> DBConfig:
     load_dotenv()
-    DB_URL = os.getenv("EXTERNAL_DATABASE_URL")
+    DB_URL = os.getenv("EXTERNAL_DB_URL")
     if DB_URL is None:
         raise ValueError("External database URL not set")
     DB_HOSTNAME = os.getenv("DB_HOSTNAME")

@@ -1,5 +1,4 @@
 import sys
-import re
 
 from bs4 import BeautifulSoup
 import requests
@@ -23,10 +22,16 @@ def toJSON(url: str) -> dict[str, str]:
         nextelement: str = pre.find_next().text
         if nextelement == "Ability: ":
             line: str = pre.text
-            if line.find('@') != -1:
-                mons.append(line[:line.find('@')].strip())
+            if line.find("@") != -1:
+                if line.find("(") != -1:
+                    mons.append(line[line.find("(") + 1 : line.find(")")].strip())
+                else:
+                    mons.append(line[: line.find("@")].strip())
             else:
-                mons.append(line[:line.find('\n')].strip())
+                if line.find("(") != -1:
+                    mons.append(line[line.find("(") : line.find(")")].strip())
+                else:
+                    mons.append(line[: line.find("\n")].strip())
         else:
             mons.append(nextelement)
 

@@ -329,5 +329,5 @@ items = [
     "Haban Berry",
     "Colbur Berry",
     "Babiri Berry",
-    "Chilan Berry"
+    "Chilan Berry",
 ]

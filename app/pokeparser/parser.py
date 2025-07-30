@@ -4,8 +4,6 @@ import re
 from bs4 import BeautifulSoup
 import requests
 
-from .utils import *
-# from utils import *
 
 def toJSON(url: str) -> dict[str, str]:
     response = requests.get(url)
@@ -20,16 +18,17 @@ def toJSON(url: str) -> dict[str, str]:
     author = soup.h2.text[4:]
 
     mons = []
-    spans = soup.find_all("span", attrs={"class": re.compile("type-*")})
-
-    for span in spans:
-        if span.text == "-":
-            continue
-        if span.text in types:
-            continue
-        if span.text in items:
-            continue
-        mons.append(span.text)
+    pres = soup.find_all("pre")
+    for pre in pres:
+        nextelement: str = pre.find_next().text
+        if nextelement == "Ability: ":
+            line: str = pre.text
+            if line.find('@') != -1:
+                mons.append(line[:line.find('@')].strip())
+            else:
+                mons.append(line[:line.find('\n')].strip())
+        else:
+            mons.append(nextelement)
 
     return {"mons": mons, "author": author, "title": title}
 

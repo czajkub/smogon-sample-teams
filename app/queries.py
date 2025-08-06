@@ -1,8 +1,5 @@
 from re import split
-from typing import List, Tuple, Any
-from random import randint
 
-from main import Team
 
 create_query = """
 CREATE TABLE teams (

@@ -5,7 +5,7 @@ import psycopg2
 from fastapi import FastAPI
 
 from loadenv import load_env
-from queries import *
+from queries import selectone, get_query
 import addteam
 
 app = FastAPI()
@@ -30,7 +30,7 @@ def get_team(
     config = load_env()
     connection = psycopg2.connect(config.DB_URL)
     cursor = connection.cursor()
-    query: str = fill_query(title, author, mons, gen, format)
+    query: str = get_query(title, author, mons, gen, format)
     cursor.execute(query)
     results: List[Tuple[Any, ...]] = cursor.fetchall()
     print(results)

@@ -58,8 +58,4 @@ def get_query(
     return query
 
 
-def selectone(results: List[Tuple[Any, ...]]) -> List[Team]:
-    size = len(results)
-    index = randint(0, size - 1)
-    result = results[index]
-    return [Team(author=result[0], title=result[1], mons=result[2], url=result[3])]
+

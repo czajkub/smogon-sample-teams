@@ -5,7 +5,7 @@ import psycopg2
 from fastapi import FastAPI
 
 from loadenv import load_env
-from queries import selectone, get_query
+from queries import get_query
 import addteam
 
 app = FastAPI()
@@ -70,6 +70,13 @@ def add_team(url: str, gen: int = 9, format: str = "OU"):
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+def selectone(results: List[Tuple[Any, ...]]) -> List[Team]:
+    size = len(results)
+    index = randint(0, size - 1)
+    result = results[index]
+    return [Team(author=result[0], title=result[1], mons=result[2], url=result[3])]
 
 
 if __name__ == "__main__":

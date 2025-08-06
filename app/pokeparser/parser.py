@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 
 from bs4 import BeautifulSoup
 import requests
@@ -13,8 +14,8 @@ def toJSON(url: str) -> dict[str, str]:
 
     soup = BeautifulSoup(response.content, "html.parser")
 
-    title = soup.title.string
-    author = soup.h2.text[4:]
+    title: str = soup.title.string
+    author: str = soup.h2.text[4:]
 
     mons = []
     pres = soup.find_all("pre")

@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-import psycopg2
 
 
 class DBConfig:
@@ -13,19 +12,6 @@ class DBConfig:
         self.DB_USER = DB_USER
         self.DB_PASS = DB_PASS
 
-    def connect(self):
-        connection = None
-        try:
-            connection = psycopg2.connect(
-                dbname=self.DB_URL,
-                host=self.DB_HOSTNAME,
-                port=self.DB_PORT,
-                user=self.DB_USER,
-                password=self.DB_PASS,
-            )
-        except psycopg2.OperationalError as e:
-            print(e)
-        return connection
 
 
 def load_env() -> DBConfig:
@@ -36,9 +22,10 @@ def load_env() -> DBConfig:
     DB_HOSTNAME = os.getenv("DB_HOSTNAME")
     if DB_HOSTNAME is None:
         raise ValueError("Database hostname not set")
-    DB_PORT = int(os.getenv("DB_PORT"))
-    if DB_PORT is None:
+    PORT = os.getenv("DB_PORT")
+    if PORT is None:
         raise ValueError("Database port not set")
+    DB_PORT: int = int(PORT)
     DB_USERNAME = os.getenv("DB_USERNAME")
     if DB_USERNAME is None:
         raise ValueError("Database username not set")

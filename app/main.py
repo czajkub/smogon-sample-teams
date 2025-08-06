@@ -1,9 +1,12 @@
-from typing import List
+from typing import List, Tuple, Any
+import re
 from pydantic import BaseModel
 import psycopg2
 from fastapi import FastAPI
 
 from loadenv import load_env
+from queries import *
+import addteam
 
 app = FastAPI()
 
@@ -15,25 +18,53 @@ class Team(BaseModel):
     url: str
 
 
-@app.get("/team")
-def get_team(onlyone: bool = True, title: str | None = None, author: str = None, mons: List[str] = None):
+@app.get("/get_team/")
+def get_team(
+    onlyone: bool = True,
+    title: str | None = None,
+    author: str | None = None,
+    mons: str | None = None,
+    gen: int | None = 9,
+    format: str | None = "OU",
+) -> List[Team] | None:
     config = load_env()
     connection = psycopg2.connect(config.DB_URL)
     cursor = connection.cursor()
-    query = f"SELECT {1 if onlyone else '*'} FROM teams"
-    if title:
-        query += f" WHERE title LIKE '{title}'"
-    if author:
-        query += f" WHERE author LIKE '{author}'"
-    if mons:
-        for mon in mons:
-            query += f" WHERE {mon} = ANY(mons)"
+    query: str = fill_query(title, author, mons, gen, format)
     cursor.execute(query)
-    team = cursor.fetchall()
+    results: List[Tuple[Any, ...]] = cursor.fetchall()
+    print(results)
     cursor.close()
     connection.close()
-    # print(team)
-    return team
+
+    if len(results) == 0:
+        return None
+
+    if onlyone:
+        return selectone(results)
+
+    teams: List[Team] = []
+    for result in results:
+        teams.append(
+            Team(author=result[0], title=result[1], mons=result[2], url=result[3])
+        )
+    return teams
+
+
+@app.post("/add_team/")
+def add_team(url: str, gen: int = 9, format: str = "OU"):
+    config = load_env()
+    connection = psycopg2.connect(config.DB_URL)
+
+    if re.match(r"^https://pokepast\.es/[a-z0-9]*$", url) is None:
+        return {"message": "provide valid URL", "status_code": 400}
+
+    inserted: bool = addteam.addteam(connection, url, gen, format)
+    connection.close()
+    if inserted:
+        return {"message": "team added successfully", "status_code": 201}
+    else:
+        return {"message": "team already exists in database", "status_code": 400}
 
 
 @app.get("/")

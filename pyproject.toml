@@ -13,7 +13,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.0",
     "ruff>=0.12.5",
+    "types-psycopg2>=2.9.21.20250718",
+    "types-requests>=2.32.4.20250611",
 ]
 parser = [
     "beautifulsoup4>=4.13.4",
